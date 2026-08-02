@@ -30,6 +30,7 @@ const SERVICES = [
 ];
 
 const BANNER_HEIGHT = 160;
+const BANNER_GAP = 12;
 
 const PROMOS = [
   { id: '1', image: require('@/assets/images/promo-airtime-banner.png') },
@@ -50,12 +51,14 @@ export default function DashboardScreen() {
   useEffect(() => {
     const timer = setInterval(() => {
       const next = (promoIndexRef.current + 1) % PROMOS.length;
-      promoRef.current?.scrollToIndex({ index: next, animated: next !== 0 });
       if (next === 0) {
-        // jump to start without animation, then let the next tick animate forward
-        setTimeout(() => {
-          promoRef.current?.scrollToIndex({ index: 0, animated: false });
-        }, 0);
+        // snap back to start without animation first
+        promoRef.current?.scrollToOffset({ offset: 0, animated: false });
+      } else {
+        promoRef.current?.scrollToOffset({
+          offset: (CARD_WIDTH + BANNER_GAP) * next,
+          animated: true,
+        });
       }
       promoIndexRef.current = next;
       setPromoIndex(next);
@@ -193,10 +196,13 @@ export default function DashboardScreen() {
               promoIndexRef.current = idx;
               setPromoIndex(idx);
             }}
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
               <TouchableOpacity
                 activeOpacity={0.92}
-                style={{ width: CARD_WIDTH }}
+                style={{
+                  width: CARD_WIDTH,
+                  marginRight: index < PROMOS.length - 1 ? BANNER_GAP : 0,
+                }}
               >
                 <Image
                   source={item.image}
@@ -206,14 +212,16 @@ export default function DashboardScreen() {
               </TouchableOpacity>
             )}
             keyExtractor={(i) => i.id}
-            snapToInterval={CARD_WIDTH}
+            pagingEnabled={false}
+            snapToInterval={CARD_WIDTH + BANNER_GAP}
+            snapToAlignment="start"
             decelerationRate="fast"
             getItemLayout={(_, index) => ({
-              length: CARD_WIDTH,
-              offset: CARD_WIDTH * index,
+              length: CARD_WIDTH + BANNER_GAP,
+              offset: (CARD_WIDTH + BANNER_GAP) * index,
               index,
             })}
-            contentContainerStyle={{ gap: 0 }}
+            contentContainerStyle={{ paddingRight: 0 }}
           />
           {/* Dots */}
           <View style={styles.promoDots}>
