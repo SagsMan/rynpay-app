@@ -6,27 +6,27 @@ import {
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48;
 
 const QUICK_ACTIONS = [
-  { id: 'transfer', label: 'To RynGet', icon: 'person-outline', route: '/transfer' },
-  { id: 'bank', label: 'To Bank', icon: 'business-outline', route: '/transfer' },
-  { id: 'withdraw', label: 'Withdraw', icon: 'arrow-down-circle-outline', route: '/transfer' },
+  { id: 'transfer', label: 'To RynGet', image: require('@/assets/images/icons/icon-to-rynget.png'), route: '/transfer' },
+  { id: 'bank', label: 'To Bank', image: require('@/assets/images/icons/icon-to-bank.png'), route: '/transfer' },
+  { id: 'withdraw', label: 'Withdraw', image: require('@/assets/images/icons/icon-withdraw.png'), route: '/transfer' },
 ];
 
 const SERVICES = [
-  { id: 'airtime', label: 'Airtime', icon: 'call-outline', route: '/airtime' },
-  { id: 'data', label: 'Data', icon: 'cellular-outline', route: '/airtime' },
-  { id: 'tv', label: 'TV', icon: 'tv-outline', route: '/airtime' },
-  { id: 'betting', label: 'Betting', icon: 'trophy-outline', route: '/airtime' },
-  { id: 'safebox', label: 'Safebox', icon: 'lock-closed-outline', route: '/airtime' },
-  { id: 'loan', label: 'Loan', icon: 'cash-outline', route: '/airtime' },
-  { id: 'invitation', label: 'Invitation', icon: 'person-add-outline', route: '/airtime' },
-  { id: 'more', label: 'More', icon: 'grid-outline', route: '/airtime' },
+  { id: 'airtime', label: 'Airtime', image: require('@/assets/images/icons/icon-airtime.png'), route: '/airtime' },
+  { id: 'data', label: 'Data', image: require('@/assets/images/icons/icon-data.png'), route: '/airtime' },
+  { id: 'tv', label: 'TV', image: require('@/assets/images/icons/icon-tv.png'), route: '/airtime' },
+  { id: 'betting', label: 'Betting', image: require('@/assets/images/icons/icon-betting.png'), route: '/airtime' },
+  { id: 'safebox', label: 'Safebox', image: require('@/assets/images/icons/icon-safebox.png'), route: '/airtime' },
+  { id: 'loan', label: 'Loan', image: require('@/assets/images/icons/icon-loan.png'), route: '/airtime' },
+  { id: 'invitation', label: 'Invitation', image: require('@/assets/images/icons/icon-invitation.png'), route: '/airtime' },
+  { id: 'more', label: 'More', image: require('@/assets/images/icons/icon-more.png'), route: '/airtime' },
 ];
 
 const BANNER_HEIGHT = 160;
@@ -83,14 +83,14 @@ export default function DashboardScreen() {
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="scan-outline" size={24} color="#0F172A" />
+            <Image source={require('@/assets/images/icons/icon-scan.png')} style={styles.headerIcon} resizeMode="contain" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="headset-outline" size={24} color="#0F172A" />
+            <Image source={require('@/assets/images/icons/icon-support.png')} style={styles.headerIcon} resizeMode="contain" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn}>
             <View style={styles.notifWrap}>
-              <Ionicons name="notifications-outline" size={24} color="#0F172A" />
+              <Image source={require('@/assets/images/icons/icon-bell.png')} style={styles.headerIcon} resizeMode="contain" />
               <View style={styles.notifBadge}>
                 <Text style={styles.notifCount}>99+</Text>
               </View>
@@ -155,9 +155,7 @@ export default function DashboardScreen() {
                 style={styles.quickActionItem}
                 onPress={() => router.push(action.route as any)}
               >
-                <View style={styles.quickActionIcon}>
-                  <Ionicons name={action.icon as any} size={22} color="#1076C9" />
-                </View>
+                <Image source={action.image} style={styles.quickActionIconImg} resizeMode="contain" />
                 <Text style={styles.quickActionLabel}>{action.label}</Text>
               </TouchableOpacity>
             ))}
@@ -173,9 +171,7 @@ export default function DashboardScreen() {
                 style={styles.serviceItem}
                 onPress={() => router.push(svc.route as any)}
               >
-                <View style={styles.serviceIcon}>
-                  <Ionicons name={svc.icon as any} size={20} color="#1076C9" />
-                </View>
+                <Image source={svc.image} style={styles.serviceIconImg} resizeMode="contain" />
                 <Text style={styles.serviceLabel}>{svc.label}</Text>
               </TouchableOpacity>
             ))}
@@ -236,9 +232,11 @@ export default function DashboardScreen() {
 
         {/* Support */}
         <TouchableOpacity style={styles.supportCard} activeOpacity={0.8}>
-          <View style={styles.supportIconWrap}>
-            <Ionicons name="headset-outline" size={22} color="#1076C9" />
-          </View>
+          <Image
+            source={require('@/assets/images/icons/icon-support.png')}
+            style={styles.supportIconImg}
+            resizeMode="contain"
+          />
           <View style={styles.supportTextWrap}>
             <Text style={styles.supportTitle}>Encounter any problem?</Text>
             <Text style={styles.supportSub}>If you have any questions, call us on 090000011</Text>
@@ -297,23 +295,18 @@ const styles = StyleSheet.create({
   },
   quickActions: { flexDirection: 'row', justifyContent: 'space-around' },
   quickActionItem: { alignItems: 'center', gap: 8 },
-  quickActionIcon: {
-    width: 56, height: 56, borderRadius: 16, backgroundColor: '#EBF4FF',
-    alignItems: 'center', justifyContent: 'center',
-  },
+  quickActionIconImg: { width: 56, height: 56 },
   quickActionLabel: { fontSize: 12, color: '#0F172A', fontFamily: 'Inter_500Medium', textAlign: 'center' },
   servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 0 },
   serviceItem: { width: '25%', alignItems: 'center', paddingVertical: 10, gap: 6 },
-  serviceIcon: {
-    width: 50, height: 50, borderRadius: 16, backgroundColor: '#EBF4FF',
-    alignItems: 'center', justifyContent: 'center',
-  },
+  serviceIconImg: { width: 50, height: 50 },
   serviceLabel: { fontSize: 11, color: '#0F172A', fontFamily: 'Inter_400Regular', textAlign: 'center' },
   promoSection: { marginHorizontal: 16, marginTop: 12 },
   promoBannerImg: { width: CARD_WIDTH, height: BANNER_HEIGHT },
   promoDots: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 10 },
   promoDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#CBD5E1' },
   promoDotActive: { width: 18, backgroundColor: '#1076C9' },
+  headerIcon: { width: 24, height: 24 },
   // Support card — white style (Figma)
   supportCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
@@ -321,10 +314,7 @@ const styles = StyleSheet.create({
     borderRadius: 16, paddingVertical: 16, paddingHorizontal: 16,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2,
   },
-  supportIconWrap: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: '#EBF4FF', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-  },
+  supportIconImg: { width: 44, height: 44, flexShrink: 0 },
   supportTextWrap: { flex: 1 },
   supportTitle: { fontSize: 15, color: '#0F172A', fontFamily: 'Inter_600SemiBold', marginBottom: 2 },
   supportSub: { fontSize: 12, color: '#64748B', fontFamily: 'Inter_400Regular' },

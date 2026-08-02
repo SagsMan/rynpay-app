@@ -1,7 +1,7 @@
 import React from 'react';
-import { Platform, StyleSheet, useColorScheme, View } from 'react-native';
+import { Image, Platform, StyleSheet, useColorScheme, View } from 'react-native';
 import { useColors } from '@/hooks/useColors';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
 
@@ -47,8 +47,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => focused ? (
+            <Image source={require('@/assets/images/icons/tab-home.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
+          ) : (
+            <Ionicons name="home-outline" size={24} color={color} />
           ),
         }}
       />
@@ -56,8 +58,10 @@ export default function TabLayout() {
         name="rewards"
         options={{
           title: 'Reward',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'diamond' : 'diamond-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => focused ? (
+            <Image source={require('@/assets/images/icons/tab-rewards.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
+          ) : (
+            <Ionicons name="diamond-outline" size={24} color={color} />
           ),
         }}
       />
@@ -65,8 +69,10 @@ export default function TabLayout() {
         name="finance"
         options={{
           title: 'Finance',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'trending-up' : 'trending-up-outline'} size={22} color={color} />
+          tabBarIcon: ({ color, focused }) => focused ? (
+            <Image source={require('@/assets/images/icons/tab-finance.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
+          ) : (
+            <Ionicons name="trending-up-outline" size={22} color={color} />
           ),
         }}
       />
