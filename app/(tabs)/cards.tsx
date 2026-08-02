@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Dimensions, Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/context/AuthContext';
 
@@ -14,58 +14,44 @@ const CARD_DESIGNS = [
   {
     id: '1',
     name: 'Classic Black',
-    colors: ['#1C1C1C', '#2D2D2D', '#3D3D3D'] as [string, string, string],
-    patternColor: 'rgba(255,255,255,0.05)',
+    image: require('@/assets/images/cards/card-black.png'),
     last4: '4521',
     type: 'debit',
   },
   {
     id: '2',
     name: 'Ocean Blue',
-    colors: ['#1076C9', '#0E5FAA', '#0B4C8C'] as [string, string, string],
-    patternColor: 'rgba(255,255,255,0.1)',
+    image: require('@/assets/images/cards/card-blue.png'),
     last4: '8834',
     type: 'virtual',
   },
   {
     id: '3',
     name: 'Hot Pink',
+    image: null,
     colors: ['#E5007D', '#C8006B', '#A60058'] as [string, string, string],
-    patternColor: 'rgba(255,255,255,0.1)',
     last4: '1290',
     type: 'debit',
   },
 ];
 
 function CardVisual({ card, isActive }: { card: typeof CARD_DESIGNS[0], isActive: boolean }) {
-  return (
-    <LinearGradient
-      colors={card.colors}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={[styles.card, { width: isActive ? CARD_W : CARD_W * 0.92, opacity: isActive ? 1 : 0.75 }]}
-    >
-      {/* Pattern overlay */}
-      <View style={[styles.cardPattern, { borderColor: card.patternColor }]} />
-      <View style={[styles.cardPattern2, { borderColor: card.patternColor }]} />
+  const cardStyle = [
+    styles.card,
+    { width: isActive ? CARD_W : CARD_W * 0.92, opacity: isActive ? 1 : 0.78 },
+  ];
 
+  const overlay = (
+    <View style={styles.cardOverlay}>
       <View style={styles.cardTop}>
-        <Text style={styles.cardBrand}>RynGet</Text>
         <View style={styles.cardTypeTag}>
           <Text style={styles.cardTypeText}>{card.type.toUpperCase()}</Text>
         </View>
       </View>
-
-      <View style={styles.chipRow}>
-        <View style={styles.chip}>
-          <View style={styles.chipInner} />
-        </View>
-      </View>
-
+      <View style={{ flex: 1 }} />
       <View style={styles.cardNumber}>
         <Text style={styles.cardNumberText}>●●●● ●●●● ●●●● {card.last4}</Text>
       </View>
-
       <View style={styles.cardBottom}>
         <View>
           <Text style={styles.cardHolderLabel}>CARD HOLDER</Text>
@@ -75,12 +61,29 @@ function CardVisual({ card, isActive }: { card: typeof CARD_DESIGNS[0], isActive
           <Text style={styles.cardHolderLabel}>EXPIRES</Text>
           <Text style={styles.cardHolderName}>12/28</Text>
         </View>
-        {/* Mastercard logo */}
-        <View style={styles.mastercardWrap}>
-          <View style={[styles.mcCircle, { backgroundColor: '#EB001B' }]} />
-          <View style={[styles.mcCircle, { backgroundColor: '#F79E1B', marginLeft: -14 }]} />
-        </View>
       </View>
+    </View>
+  );
+
+  if (card.image) {
+    return (
+      <View style={[cardStyle, { overflow: 'hidden' }]}>
+        <Image source={card.image} style={styles.cardImage} resizeMode="cover" />
+        {overlay}
+      </View>
+    );
+  }
+
+  return (
+    <LinearGradient
+      colors={(card as any).colors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={cardStyle}
+    >
+      <View style={[styles.cardPatternCircle, { borderColor: 'rgba(255,255,255,0.08)', top: -60, right: -40 }]} />
+      <View style={[styles.cardPatternCircle2, { borderColor: 'rgba(255,255,255,0.08)', bottom: -30, left: -20 }]} />
+      {overlay}
     </LinearGradient>
   );
 }
@@ -92,6 +95,13 @@ const CARD_ACTIONS = [
   { id: 'block', icon: 'ban-outline', label: 'Block Card' },
 ];
 
+const CARD_BENEFITS = [
+  { id: 'personal', image: require('@/assets/images/icons/card-feat-person.png'), label: 'Personal' },
+  { id: 'shopping', image: require('@/assets/images/icons/card-feat-shop.png'), label: 'Shopping' },
+  { id: 'rewards', image: require('@/assets/images/icons/card-feat-rewards.png'), label: 'Rewards' },
+  { id: 'secure', image: require('@/assets/images/icons/card-feat-secure.png'), label: 'Secure' },
+];
+
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
@@ -101,6 +111,7 @@ export default function CardsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#EEF3FC' }}>
+      {/* Header */}
       <LinearGradient
         colors={['#1076C9', '#0047A3']}
         style={[styles.header, { paddingTop: topPad + 12 }]}
@@ -115,10 +126,10 @@ export default function CardsScreen() {
             <Text style={styles.addCardText}>Add Card</Text>
           </TouchableOpacity>
         </View>
-        {/* Hero illustration */}
+        {/* Hero — blue card as illustration */}
         <Image
-          source={require('@/assets/images/hero-card-illustration.png')}
-          style={styles.headerIllustration}
+          source={require('@/assets/images/cards/card-blue.png')}
+          style={styles.heroCard}
           resizeMode="contain"
         />
       </LinearGradient>
@@ -131,7 +142,6 @@ export default function CardsScreen() {
         <View style={styles.cardsCarousel}>
           <ScrollView
             horizontal
-            pagingEnabled={false}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.cardsScroll}
             snapToInterval={CARD_W + 16}
@@ -149,6 +159,19 @@ export default function CardsScreen() {
           <View style={styles.dots}>
             {CARD_DESIGNS.map((_, i) => (
               <View key={i} style={[styles.dot, i === activeCard && styles.dotActive]} />
+            ))}
+          </View>
+        </View>
+
+        {/* Card Benefits */}
+        <View style={styles.benefitsSection}>
+          <Text style={styles.sectionTitle}>Card Benefits</Text>
+          <View style={styles.benefitsGrid}>
+            {CARD_BENEFITS.map((b) => (
+              <View key={b.id} style={styles.benefitItem}>
+                <Image source={b.image} style={styles.benefitIcon} resizeMode="contain" />
+                <Text style={styles.benefitLabel}>{b.label}</Text>
+              </View>
             ))}
           </View>
         </View>
@@ -176,7 +199,7 @@ export default function CardsScreen() {
           </View>
         </View>
 
-        {/* Card actions */}
+        {/* Card controls */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Card Controls</Text>
           <View style={styles.actionsGrid}>
@@ -191,11 +214,11 @@ export default function CardsScreen() {
           </View>
         </View>
 
-        {/* Transactions on this card */}
+        {/* Recent Transactions */}
         <View style={styles.txSection}>
           <Text style={styles.sectionTitle}>Recent Transactions</Text>
           {[1, 2, 3].map((n) => (
-            <View key={n} style={styles.txRow}>
+            <View key={n} style={[styles.txRow, n === 3 && { borderBottomWidth: 0 }]}>
               <View style={[styles.txIcon, { backgroundColor: n === 1 ? '#DCFCE7' : n === 2 ? '#FEF3C7' : '#EBF4FF' }]}>
                 <Ionicons
                   name={n === 1 ? 'cart-outline' : n === 2 ? 'phone-portrait-outline' : 'swap-horizontal-outline'}
@@ -219,56 +242,61 @@ export default function CardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: 20, paddingBottom: 0, overflow: 'hidden',
-  },
+  header: { paddingHorizontal: 20, paddingBottom: 0, overflow: 'hidden' },
   headerContent: {
     flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingBottom: 12,
   },
   headerTitle: { fontSize: 22, fontFamily: 'Inter_700Bold', color: '#fff' },
   headerSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', fontFamily: 'Inter_400Regular', marginTop: 2 },
-  headerIllustration: { width: '100%', height: 140, marginBottom: -4 },
+  heroCard: { width: '100%', height: 130, marginBottom: -4, opacity: 0.92 },
   addCardBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7,
   },
   addCardText: { fontSize: 13, color: '#1076C9', fontFamily: 'Inter_600SemiBold' },
+
   cardsCarousel: { paddingTop: 24 },
   cardsScroll: { paddingHorizontal: 28, gap: 16 },
-  card: { borderRadius: 20, padding: 20, height: 200, overflow: 'hidden', position: 'relative' },
-  cardPattern: {
-    position: 'absolute', width: 180, height: 180, borderRadius: 90,
-    borderWidth: 50, top: -60, right: -40,
+  card: { borderRadius: 20, height: 200, overflow: 'hidden', position: 'relative' },
+  cardImage: { ...StyleSheet.absoluteFillObject, width: undefined, height: undefined },
+  cardPatternCircle: {
+    position: 'absolute', width: 180, height: 180, borderRadius: 90, borderWidth: 50,
   },
-  cardPattern2: {
-    position: 'absolute', width: 120, height: 120, borderRadius: 60,
-    borderWidth: 30, bottom: -30, left: -20,
+  cardPatternCircle2: {
+    position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 30,
   },
-  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  cardBrand: { fontSize: 16, fontFamily: 'Inter_700Bold', color: '#fff', letterSpacing: 0.5 },
+  cardOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    padding: 20,
+    flexDirection: 'column',
+  },
+  cardTop: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' },
   cardTypeTag: {
-    backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 4,
     paddingHorizontal: 8, paddingVertical: 2,
   },
   cardTypeText: { fontSize: 9, color: '#fff', fontFamily: 'Inter_600SemiBold', letterSpacing: 1 },
-  chipRow: { marginBottom: 12 },
-  chip: {
-    width: 36, height: 28, backgroundColor: '#D4A843', borderRadius: 5,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  chipInner: { width: 28, height: 20, borderRadius: 3, borderWidth: 1.5, borderColor: '#C29030' },
   cardNumber: { marginBottom: 8 },
   cardNumberText: { fontSize: 15, color: 'rgba(255,255,255,0.9)', fontFamily: 'Inter_500Medium', letterSpacing: 2 },
   cardBottom: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
-  cardHolderLabel: { fontSize: 8, color: 'rgba(255,255,255,0.6)', fontFamily: 'Inter_400Regular', letterSpacing: 1 },
+  cardHolderLabel: { fontSize: 8, color: 'rgba(255,255,255,0.65)', fontFamily: 'Inter_400Regular', letterSpacing: 1 },
   cardHolderName: { fontSize: 12, color: '#fff', fontFamily: 'Inter_600SemiBold', letterSpacing: 0.5 },
-  mastercardWrap: { flexDirection: 'row', alignItems: 'center' },
-  mcCircle: { width: 28, height: 28, borderRadius: 14 },
+
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 16 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#CBD5E1' },
   dotActive: { width: 18, backgroundColor: '#1076C9' },
+
+  benefitsSection: {
+    backgroundColor: '#fff', margin: 16, marginBottom: 0, borderRadius: 16, padding: 18,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+  },
+  benefitsGrid: { flexDirection: 'row', justifyContent: 'space-around' },
+  benefitItem: { alignItems: 'center', gap: 8 },
+  benefitIcon: { width: 48, height: 48 },
+  benefitLabel: { fontSize: 11, color: '#0F172A', fontFamily: 'Inter_500Medium', textAlign: 'center' },
+
   cardInfoSection: {
-    backgroundColor: '#fff', margin: 16, borderRadius: 16, overflow: 'hidden',
+    backgroundColor: '#fff', margin: 16, marginBottom: 0, borderRadius: 16, overflow: 'hidden',
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
   cardInfoRow: {
@@ -277,11 +305,15 @@ const styles = StyleSheet.create({
   },
   cardInfoLabel: { fontSize: 13, color: '#64748B', fontFamily: 'Inter_400Regular' },
   cardInfoValue: { fontSize: 13, color: '#0F172A', fontFamily: 'Inter_600SemiBold' },
-  activeBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#DCFCE7', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  activeBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: '#DCFCE7', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
+  },
   activeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#22C55E' },
   activeText: { fontSize: 12, color: '#16A34A', fontFamily: 'Inter_600SemiBold' },
+
   actionsSection: {
-    backgroundColor: '#fff', marginHorizontal: 16, borderRadius: 16, padding: 18, marginBottom: 12,
+    backgroundColor: '#fff', margin: 16, marginBottom: 0, borderRadius: 16, padding: 18,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
   sectionTitle: { fontSize: 16, fontFamily: 'Inter_700Bold', color: '#0F172A', marginBottom: 14 },
@@ -289,8 +321,9 @@ const styles = StyleSheet.create({
   actionItem: { alignItems: 'center', gap: 6 },
   actionIcon: { width: 52, height: 52, borderRadius: 16, backgroundColor: '#EBF4FF', alignItems: 'center', justifyContent: 'center' },
   actionLabel: { fontSize: 11, color: '#0F172A', fontFamily: 'Inter_400Regular', textAlign: 'center' },
+
   txSection: {
-    backgroundColor: '#fff', marginHorizontal: 16, borderRadius: 16, padding: 18, marginBottom: 12,
+    backgroundColor: '#fff', margin: 16, borderRadius: 16, padding: 18,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
   txRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
