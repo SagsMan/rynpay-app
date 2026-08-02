@@ -201,13 +201,16 @@ export default function DashboardScreen() {
                 activeOpacity={0.92}
                 style={{
                   width: CARD_WIDTH,
+                  height: BANNER_HEIGHT,
+                  borderRadius: 16,
+                  overflow: 'hidden',
                   marginRight: index < PROMOS.length - 1 ? BANNER_GAP : 0,
                 }}
               >
                 <Image
                   source={item.image}
                   style={styles.promoBannerImg}
-                  resizeMode="cover"
+                  resizeMode="stretch"
                 />
               </TouchableOpacity>
             )}
@@ -307,7 +310,7 @@ const styles = StyleSheet.create({
   },
   serviceLabel: { fontSize: 11, color: '#0F172A', fontFamily: 'Inter_400Regular', textAlign: 'center' },
   promoSection: { marginHorizontal: 16, marginTop: 12 },
-  promoBannerImg: { width: CARD_WIDTH, height: BANNER_HEIGHT, borderRadius: 16 },
+  promoBannerImg: { width: CARD_WIDTH, height: BANNER_HEIGHT },
   promoDots: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 10 },
   promoDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#CBD5E1' },
   promoDotActive: { width: 18, backgroundColor: '#1076C9' },
