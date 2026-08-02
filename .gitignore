@@ -45,3 +45,8 @@ yarn-error.*
 .local/
 .agents/
 attached_assets/
+
+# Replit workspace files
+.replit
+.replitignore
+replit.md
