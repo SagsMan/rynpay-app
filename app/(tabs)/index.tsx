@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Platform, Dimensions, FlatList, Image,
@@ -29,9 +29,12 @@ const SERVICES = [
   { id: 'more', label: 'More', icon: 'grid-outline', route: '/airtime' },
 ];
 
+const BANNER_HEIGHT = 160;
+
 const PROMOS = [
   { id: '1', image: require('@/assets/images/promo-airtime-banner.png') },
   { id: '2', image: require('@/assets/images/promo-banner.png') },
+  { id: '3', image: require('@/assets/images/promo-agent-banner.png') },
 ];
 
 export default function DashboardScreen() {
@@ -39,7 +42,26 @@ export default function DashboardScreen() {
   const { user } = useAuth();
   const [balanceVisible, setBalanceVisible] = useState(false);
   const [promoIndex, setPromoIndex] = useState(0);
+  const promoRef = useRef<FlatList>(null);
+  const promoIndexRef = useRef(0);
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
+
+  // Auto-slide every 3 s, loops back to start seamlessly
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const next = (promoIndexRef.current + 1) % PROMOS.length;
+      promoRef.current?.scrollToIndex({ index: next, animated: next !== 0 });
+      if (next === 0) {
+        // jump to start without animation, then let the next tick animate forward
+        setTimeout(() => {
+          promoRef.current?.scrollToIndex({ index: 0, animated: false });
+        }, 0);
+      }
+      promoIndexRef.current = next;
+      setPromoIndex(next);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
   const bottomPad = Platform.OS === 'web' ? 34 : insets.bottom;
 
   const fmtBalance = (n: number) =>
@@ -160,15 +182,22 @@ export default function DashboardScreen() {
         {/* Promo Banner */}
         <View style={styles.promoSection}>
           <FlatList
+            ref={promoRef}
             data={PROMOS}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
+            scrollEnabled
             onMomentumScrollEnd={(e) => {
-              setPromoIndex(Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH));
+              const idx = Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH);
+              promoIndexRef.current = idx;
+              setPromoIndex(idx);
             }}
             renderItem={({ item }) => (
-              <TouchableOpacity activeOpacity={0.92} style={{ width: CARD_WIDTH }}>
+              <TouchableOpacity
+                activeOpacity={0.92}
+                style={{ width: CARD_WIDTH }}
+              >
                 <Image
                   source={item.image}
                   style={styles.promoBannerImg}
@@ -179,6 +208,11 @@ export default function DashboardScreen() {
             keyExtractor={(i) => i.id}
             snapToInterval={CARD_WIDTH}
             decelerationRate="fast"
+            getItemLayout={(_, index) => ({
+              length: CARD_WIDTH,
+              offset: CARD_WIDTH * index,
+              index,
+            })}
             contentContainerStyle={{ gap: 0 }}
           />
           {/* Dots */}
@@ -265,7 +299,7 @@ const styles = StyleSheet.create({
   },
   serviceLabel: { fontSize: 11, color: '#0F172A', fontFamily: 'Inter_400Regular', textAlign: 'center' },
   promoSection: { marginHorizontal: 16, marginTop: 12 },
-  promoBannerImg: { width: '100%', height: 140, borderRadius: 16 },
+  promoBannerImg: { width: CARD_WIDTH, height: BANNER_HEIGHT, borderRadius: 16 },
   promoDots: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingTop: 10 },
   promoDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#CBD5E1' },
   promoDotActive: { width: 18, backgroundColor: '#1076C9' },
