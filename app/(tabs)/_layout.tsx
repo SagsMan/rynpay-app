@@ -80,8 +80,10 @@ export default function TabLayout() {
         name="cards"
         options={{
           title: 'Cards',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'card' : 'card-outline'} size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => focused ? (
+            <Image source={require('@/assets/images/icons/tab-cards.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
+          ) : (
+            <Ionicons name="card-outline" size={24} color={color} />
           ),
         }}
       />
